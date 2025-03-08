@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:prosta_aplikcja/models/cart_model.dart';
+import 'package:prosta_aplikcja/models/Booked_model.dart';
 import 'package:prosta_aplikcja/widgets/subtitles_text.dart';
 import 'package:provider/provider.dart';
 
@@ -7,7 +7,7 @@ import '../../providers/cart_provider.dart';
 
 class QuantityBottomSheetWidget extends StatelessWidget {
   const QuantityBottomSheetWidget({super.key, required this.cartModel});
-  final CartModel cartModel;
+  final BookedModel cartModel;
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);

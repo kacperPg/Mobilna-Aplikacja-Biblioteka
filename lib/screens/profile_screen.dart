@@ -1,3 +1,4 @@
+import 'package:barcode_widget/barcode_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:prosta_aplikcja/models/user_model.dart';
@@ -5,6 +6,7 @@ import 'package:prosta_aplikcja/providers/theme_provider.dart';
 import 'package:prosta_aplikcja/providers/user_provider.dart';
 import 'package:prosta_aplikcja/screens/auth/login.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/loading_manager.dart';
+import 'package:prosta_aplikcja/screens/inner_screens/update_profile.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/viewed_recently.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/wishlist_screen.dart';
 import 'package:prosta_aplikcja/services/assets_manager.dart';
@@ -14,6 +16,7 @@ import 'package:prosta_aplikcja/widgets/titles_text.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
+  static const routeName = '/ProfileScreen';
   const ProfileScreen({super.key});
 
   @override
@@ -54,6 +57,36 @@ class _ProfileScreenState extends State<ProfileScreen>
   void initState() {
     fetchUserInfo();
     super.initState();
+  }
+
+  void showBarcodePopup(BuildContext context, String barcodeData) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Kod kreskowy", textAlign: TextAlign.center),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              BarcodeWidget(
+                barcode: Barcode.code128(), 
+                data: barcodeData,
+                width: 200,
+                height: 80,
+              ),
+            ],
+          ),
+          actions: [
+            Center(
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Zamknij"),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -133,9 +166,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                               ],
                             ),
                           ),
-                    const SizedBox(
-                      height: 15,
-                    ),
+                      const SizedBox(
+                        height: 15,
+                      ),
                     // Padding(
                     //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     //   child: Row(
@@ -169,7 +202,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                     //     ],
                     //   ),
                     // ),
-                    
+                    userModel == null
+                        ? const SizedBox.shrink()
+                        : Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          showBarcodePopup(context, userModel!.userId);
+                        },
+                        child: const Text("Pokaż kod kreskowy"),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14.0, vertical: 10),
@@ -201,28 +243,42 @@ class _ProfileScreenState extends State<ProfileScreen>
                               },
                             ),
                           ),
-                             Visibility(
+                          Visibility(
                             visible: userModel == null ? false : true,
-                            child:CustomListTile(
-                            text: "Ostatnio wyświetlone",
-                            imagePath: AssetsManager.recent,
-                            function: () {
-                              Navigator.pushNamed(
-                                  context, ViewedRecentlyScreen.routeName);
-                            },
-                          ),),
-                             Visibility(
-                            visible: userModel == null ? false : true,
-                            child:CustomListTile(
-                              imagePath: AssetsManager.fees,
-                              text: "Opłaty",
-                              function: () {})),
-                             Visibility(
-                            visible: userModel == null ? false : true,
-                            child:CustomListTile(
-                              imagePath: AssetsManager.privacy,
-                              text: "Dane użytkownika",
-                              function: () {})),
+                            child: CustomListTile(
+                              text: "Ostatnio wyświetlone",
+                              imagePath: AssetsManager.recent,
+                              function: () {
+                                Navigator.pushNamed(
+                                    context, ViewedRecentlyScreen.routeName);
+                              },
+                            ),
+                          ),
+                          Visibility(
+                              visible: userModel == null ? false : true,
+                              child: CustomListTile(
+                                  imagePath: AssetsManager.fees,
+                                  text: "Opłaty",
+                                  function: () {})),
+                          Visibility(
+                              visible: userModel == null ? false : true,
+                              child: CustomListTile(
+                                imagePath: AssetsManager.privacy,
+                                text: "Dane użytkownika",
+                                function: () {
+                                  Navigator.pushNamed(
+                                      context, UpdateUserScreen.routeName);
+                                },
+                              )),
+                          if (userModel?.userRole == 'admin')
+                            CustomListTile(
+                              text: "Zarządzanie aplikacją",
+                              imagePath: AssetsManager.libraryIcon,
+                              function: () {
+                                Navigator.pushNamed(
+                                    context, '/DashboardScreen');
+                              },
+                            ),
                           const Divider(
                             thickness: 1,
                           ),
@@ -243,7 +299,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                     const Divider(
                       thickness: 1,
                     ),
-                    const SizedBox(height: 10),
                     Center(
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(

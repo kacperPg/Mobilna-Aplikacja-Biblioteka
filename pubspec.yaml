@@ -53,6 +53,10 @@ dependencies:
   google_sign_in: ^6.1.4
   fluttertoast: ^8.2.10
   dio: ^5.7.0
+  dotted_border: ^2.1.0
+  flutter_cache_manager: ^3.4.1
+  barcode: ^2.2.9
+  barcode_widget: ^2.0.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

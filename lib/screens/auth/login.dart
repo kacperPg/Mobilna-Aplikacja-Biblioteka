@@ -47,7 +47,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       _emailController.dispose();
       _passwordController.dispose();
-      // Focus Nodes
       _emailFocusNode.dispose();
       _passwordFocusNode.dispose();
     }
@@ -57,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _loginFct() async {
     if (_formkey.currentState != null) {
       final isValid = _formkey.currentState!.validate();
-    FocusScope.of(context).unfocus();
+      FocusScope.of(context).unfocus();
 
       FocusScope.of(context).unfocus();
       if (isValid) {

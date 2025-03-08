@@ -1,11 +1,9 @@
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:prosta_aplikcja/models/cart_model.dart';
+import 'package:prosta_aplikcja/models/Booked_model.dart';
 import 'package:prosta_aplikcja/providers/cart_provider.dart';
 import 'package:prosta_aplikcja/providers/products_provider.dart';
-import 'package:prosta_aplikcja/screens/booked/quantity_btm_sheet.dart';
-import 'package:prosta_aplikcja/widgets/subtitles_text.dart';
 import 'package:prosta_aplikcja/widgets/titles_text.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +13,7 @@ class BookedWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    final cartModel = Provider.of<CartModel>(context);
+    final cartModel = Provider.of<BookedModel>(context);
     final productsProvider = Provider.of<ProductsProvider>(context);
     final getCurrProduct = productsProvider.findByProdId(cartModel.productId);
     final cartProvider = Provider.of<CartProvider>(context);

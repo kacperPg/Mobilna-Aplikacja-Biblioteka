@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class CartModel with ChangeNotifier {
+class BookedModel with ChangeNotifier {
   final String cartId;
   final String productId;
   final int quantity;
 
-  CartModel({
+  BookedModel({
     required this.cartId,
     required this.productId,
     required this.quantity,

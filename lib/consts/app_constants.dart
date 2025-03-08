@@ -1,5 +1,5 @@
 import 'package:prosta_aplikcja/models/categories_model.dart';
-
+import 'package:flutter/material.dart';
 import '../services/assets_manager.dart';
 
 
@@ -121,4 +121,19 @@ class AppConstants {
       image: AssetsManager.romanse,
       name: "Romanse",
     )];
+
+    
+  static List<DropdownMenuItem<String>>? get categoriesDropDownList {
+    List<DropdownMenuItem<String>>? menuItems =
+        List<DropdownMenuItem<String>>.generate(
+      categoriesList.length,
+      (index) => DropdownMenuItem(
+        value: categoriesList[index].id,
+        child: Text(
+          categoriesList[index].name,
+        ),
+      ),
+    );
+    return menuItems;
+  }
 }

@@ -29,7 +29,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late final TextEditingController _nameController,
       _emailController,
       _passwordController,
-      _repeatPasswordController;
+      _repeatPasswordController,
+      _studentIdController,
+      _yearOfBirthController;
 
   late final FocusNode _nameFocusNode,
       _emailFocusNode,
@@ -48,11 +50,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     _repeatPasswordController = TextEditingController();
-    // Focus Nodes
     _nameFocusNode = FocusNode();
     _emailFocusNode = FocusNode();
     _passwordFocusNode = FocusNode();
     _repeatPasswordFocusNode = FocusNode();
+    _yearOfBirthController = TextEditingController();
+    _studentIdController = TextEditingController();
     super.initState();
   }
 
@@ -68,60 +71,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _emailFocusNode.dispose();
       _passwordFocusNode.dispose();
       _repeatPasswordFocusNode.dispose();
+      _yearOfBirthController.dispose();
+      _studentIdController.dispose();
     }
     super.dispose();
   }
 
-Future<void> _registerFCT() async {
-  final isValid = _formkey.currentState!.validate();
-  FocusScope.of(context).unfocus();
-  if (isValid) {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
+  Future<void> _registerFCT() async {
+    final isValid = _formkey.currentState!.validate();
+    FocusScope.of(context).unfocus();
 
-      await auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+    if (isValid) {
+      try {
+        setState(() {
+          _isLoading = true;
+        });
 
-      final User? user = auth.currentUser;
-      final String uid = user!.uid;
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child("usersImages")
-          .child("${_emailController.text.trim()}.jpg");
+        await auth.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
 
-      if (_pickedImage != null) { 
-        try {
-          final downloadTask = await ref.putFile(File(_pickedImage!.path));
-          userImageUrl = await downloadTask.ref.getDownloadURL();
-        } catch (error) {
-          print("Nie udało się dodać zdjęcia: $error"); 
+        final User? user = auth.currentUser;
+        final String uid = user!.uid;
+
+        if (_pickedImage != null) {
+          final ref = FirebaseStorage.instance
+              .ref()
+              .child("usersImages")
+              .child("${_emailController.text.trim()}.jpg");
+
+          await ref.putFile(File(_pickedImage!.path));
+          userImageUrl = await ref.getDownloadURL();
+        } else {
+          userImageUrl =
+              "https://s3.amazonaws.com/37assets/svn/765-default-avatar.png";
         }
-      }
-      // else{
-      //     final downloadTask = await ref.putFile(File(AssetsManager.userIcon));
-      //     userImageUrl = await downloadTask.ref.getDownloadURL();
-      // }
 
-      await FirebaseFirestore.instance.collection("users").doc(uid).set({
-        'userId': uid,
-        'userName': _nameController.text,
-        'userImage': userImageUrl, 
-        'userEmail': _emailController.text.toLowerCase(),
-        'createdAt': Timestamp.now(),
-        'userWish': [],
-        'userBooked': [],
-      });
+        await FirebaseFirestore.instance.collection("users").doc(uid).set({
+          'userId': uid,
+          'userName': _nameController.text,
+          'userImage': userImageUrl,
+          'userEmail': _emailController.text.toLowerCase(),
+          'createdAt': Timestamp.now(),
+          'userRole': "Standard",
+          'userWish': [],
+          'userBooked': [],
+          'yearOfBirth': _yearOfBirthController.text,
+          'studentId': _studentIdController.text,
+        });
 
-      Fluttertoast.showToast(
-        msg: "Konto zostało utworzone",
-        textColor: Colors.white,
-      );
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, RootScreen.routeName);
+        Fluttertoast.showToast(
+          msg: "Konto zostało utworzone",
+          textColor: Colors.white,
+        );
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, RootScreen.routeName);
       } on FirebaseException catch (error) {
         await MyAppMethods.showErrorOrWarningDialog(
           context: context,
@@ -142,7 +147,7 @@ Future<void> _registerFCT() async {
     }
   }
 
-    Future<void> localImagePicker() async {
+  Future<void> localImagePicker() async {
     final ImagePicker imagePicker = ImagePicker();
     await MyAppMethods.imagePickerDialog(
       context: context,
@@ -164,7 +169,6 @@ Future<void> _registerFCT() async {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -336,6 +340,57 @@ Future<void> _registerFCT() async {
                         ),
                         const SizedBox(
                           height: 36.0,
+                        ),
+                        TextFormField(
+                          controller: _yearOfBirthController,
+                          readOnly:
+                              true,  
+                          decoration: const InputDecoration(
+                            hintText: "Rok urodzenia",
+                            prefixIcon: Icon(Icons.calendar_today),
+                          ),
+                          onTap: () async {
+                            FocusScope.of(context)
+                                .requestFocus(FocusNode()); 
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime.now(),
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                _yearOfBirthController.text =
+                                    "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";  
+                              });
+                            }
+                          },
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Proszę podać rok urodzenia';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(
+                          height: 16.0,
+                        ),
+                        TextFormField(
+                          controller: _studentIdController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            hintText: "Numer albumu",
+                            prefixIcon: Icon(Icons.book),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Proszę podać numer albumu';
+                            }
+                            if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                              return 'Numer albumu może zawierać tylko liczby';
+                            }
+                            return null;
+                          },
                         ),
                         SizedBox(
                           width: double.infinity,

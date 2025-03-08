@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:prosta_aplikcja/root_screen.dart';
+import 'package:prosta_aplikcja/services/assets_manager.dart';
 import 'package:prosta_aplikcja/widgets/subtitles_text.dart';
 import 'package:prosta_aplikcja/widgets/titles_text.dart';
 
@@ -22,17 +23,11 @@ class EmptyBagWidget extends StatelessWidget {
             fontSize: 20,
             label: appBarText,
           ),
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-                onPressed: () {
-                  Navigator.canPop(context) ? Navigator.pop(context) : null;
-                },
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  size: 18,
-                )),
-          )),
+         leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios),
+            onPressed: () => Navigator.pop(context),
+          ),
+      ),
       body: Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: Column(

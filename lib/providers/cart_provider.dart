@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:prosta_aplikcja/models/cart_model.dart';
+import 'package:prosta_aplikcja/models/Booked_model.dart';
 import 'package:uuid/uuid.dart';
 
 class CartProvider with ChangeNotifier {
-  final Map<String, CartModel> _cartItem = {};
+  final Map<String, BookedModel> _cartItem = {};
 
-  Map<String, CartModel> get getCartItems {
+  Map<String, BookedModel> get getCartItems {
     return _cartItem;
   }
 
   void addProductToCart({required String productId}) {
     _cartItem.putIfAbsent(
         productId,
-        () => CartModel(
+        () => BookedModel(
             cartId: const Uuid().v4(), productId: productId, quantity: 1));
     notifyListeners();
   }
@@ -24,7 +24,7 @@ class CartProvider with ChangeNotifier {
   void updateQty({required String productId, required int qty}) {
     _cartItem.update(
       productId,
-      (cartItem) => CartModel(
+      (cartItem) => BookedModel(
         cartId: cartItem.cartId,
         productId: productId,
         quantity: qty,

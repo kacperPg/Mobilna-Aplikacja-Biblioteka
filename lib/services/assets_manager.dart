@@ -32,6 +32,8 @@ class AssetsManager {
   static String orderSvg = "$bagImagesPath/order_svg.png";
   static String bookedSvg = "$bagImagesPath/booked.png";
   static String wishlistSvg = "$bagImagesPath/wishlist_svg.png";
+  static String search = "$bagImagesPath/search.png";
+  static String upload = "$bagImagesPath/uploud.png";
   // Banners
   static String banner1 = "$bannersImagesPath/banner_1.png";
   static String banner2 = "$bannersImagesPath/banner_2.png";

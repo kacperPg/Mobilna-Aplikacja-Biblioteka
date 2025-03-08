@@ -42,6 +42,7 @@ class LatestArrivalProductsWidget extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(width: 10),
               FittedBox(
                 child: Column(
                   children: [

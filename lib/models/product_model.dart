@@ -23,11 +23,10 @@ class ProductModel with ChangeNotifier {
 
   factory ProductModel.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
-    // data.containsKey("")
     return ProductModel(
-      productId: data["productId"], //doc.get(field),
+      productId:data["productId"],
       productTitle: data['productTitle'],
-      productAutor: data['productAutor'],
+      productAutor: data['productAuthor'],
       productCategory: data['productCategory'],
       productDescription: data['productDescription'],
       productImage: data['productImage'],

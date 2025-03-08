@@ -1,39 +1,39 @@
 class MyValidators {
   static String? displayNamevalidator(String? displayName) {
     if (displayName == null || displayName.isEmpty) {
-      return 'Display name cannot be empty';
+      return 'Nazwa użytkownika nie może być pusta';
     }
     if (displayName.length < 3 || displayName.length > 20) {
-      return 'Display name must be between 3 and 20 characters';
+      return 'Nazwa użytkownika musi mieć od 3 do 20 znaków';
     }
 
-    return null; // Return null if display name is valid
+    return null; 
   }
 
   static String? emailValidator(String? value) {
     if (value!.isEmpty) {
-      return 'Please enter an email';
+      return 'Proszę podać adres email';
     }
     if (!RegExp(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
         .hasMatch(value)) {
-      return 'Please enter a valid email';
+      return 'Proszę podać poprawny adres email';
     }
     return null;
   }
 
   static String? passwordValidator(String? value) {
     if (value!.isEmpty) {
-      return 'Please enter a password';
+      return 'Proszę podać hasło';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
+      return 'Hasło musi zawierać co najmniej 6 znaków';
     }
     return null;
   }
 
   static String? repeatPasswordValidator({String? value, String? password}) {
     if (value != password) {
-      return 'Passwords do not match';
+      return 'Hasła się nie zgadzają';
     }
     return null;
   }

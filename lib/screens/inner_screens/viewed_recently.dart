@@ -35,19 +35,10 @@ class ViewedRecentlyScreen extends StatelessWidget {
                     fontSize: 20,
                     label: "Ostanio wyświetlane",
                   ),
-                  leading: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: IconButton(
-                        onPressed: () {
-                          Navigator.canPop(context)
-                              ? Navigator.pop(context)
-                              : null;
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          size: 18,
-                        )),
-                  )),
+               leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios),
+            onPressed: () => Navigator.pop(context),
+          ),),
               body: DynamicHeightGridView(
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
