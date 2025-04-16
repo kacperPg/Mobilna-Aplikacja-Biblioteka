@@ -7,6 +7,7 @@ import 'package:prosta_aplikcja/providers/user_provider.dart';
 import 'package:prosta_aplikcja/screens/auth/login.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/loading_manager.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/update_profile.dart';
+import 'package:prosta_aplikcja/screens/inner_screens/userOrders/orders_screen.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/viewed_recently.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/wishlist_screen.dart';
 import 'package:prosta_aplikcja/services/assets_manager.dart';
@@ -17,6 +18,7 @@ import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = '/ProfileScreen';
+
   const ProfileScreen({super.key});
 
   @override
@@ -31,8 +33,16 @@ class _ProfileScreenState extends State<ProfileScreen>
   UserModel? userModel;
   bool _isLoading = true;
 
-  Future<void> fetchUserInfo() async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+ Future<void> fetchUserInfo() async {
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
+  
+  if (FirebaseAuth.instance.currentUser == null) {
+    setState(() {
+      _isLoading = false;
+    });
+    return; 
+  }
+  
     try {
       setState(() {
         _isLoading = true;
@@ -55,8 +65,16 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   void initState() {
+     final auth = FirebaseAuth.instance;
+     User? user = auth.currentUser;
+     if (user != null) {
     fetchUserInfo();
-    super.initState();
+    } else {
+      // Jeśli użytkownik nie jest zalogowany, nie wykonujemy zapytania
+      setState(() {
+        _isLoading = false;
+      });
+  }
   }
 
   void showBarcodePopup(BuildContext context, String barcodeData) {
@@ -69,9 +87,9 @@ class _ProfileScreenState extends State<ProfileScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               BarcodeWidget(
-                barcode: Barcode.code128(), 
+                barcode: Barcode.code128(),
                 data: barcodeData,
-                width: 200,
+                width: 350,
                 height: 80,
               ),
             ],
@@ -166,9 +184,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                               ],
                             ),
                           ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                    const SizedBox(
+                      height: 15,
+                    ),
                     // Padding(
                     //   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     //   child: Row(
@@ -205,13 +223,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                     userModel == null
                         ? const SizedBox.shrink()
                         : Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          showBarcodePopup(context, userModel!.userId);
-                        },
-                        child: const Text("Pokaż kod kreskowy"),
-                      ),
-                    ),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                showBarcodePopup(context, userModel!.userId);
+                              },
+                              child: const Text("Pokaż kod kreskowy"),
+                            ),
+                          ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14.0, vertical: 10),
@@ -222,13 +240,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                           Visibility(
                             visible: userModel == null ? false : true,
                             child: CustomListTile(
-                              text: "Wypożyczone",
+                              text: "Wypożyczone ksiązki",
                               imagePath: AssetsManager.orderSvg,
                               function: () {
-                                // Navigator.pushNamed(
-                                //   context,
-                                //   BookedScreen.routeName,
-                                // );
+                                Navigator.pushNamed(
+                                  context,
+                                  OrdersScreenFree.routeName,
+                                );
                               },
                             ),
                           ),
@@ -254,17 +272,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                               },
                             ),
                           ),
-                          Visibility(
-                              visible: userModel == null ? false : true,
-                              child: CustomListTile(
-                                  imagePath: AssetsManager.fees,
-                                  text: "Opłaty",
-                                  function: () {})),
+                          // Visibility(
+                          //     visible: userModel == null ? false : true,
+                          //     child: CustomListTile(
+                          //         imagePath: AssetsManager.fees,
+                          //         text: "Opłaty",
+                          //         function: () {})
+                          // ),
                           Visibility(
                               visible: userModel == null ? false : true,
                               child: CustomListTile(
                                 imagePath: AssetsManager.privacy,
-                                text: "Dane użytkownika",
+                                text: "Moje Dane",
                                 function: () {
                                   Navigator.pushNamed(
                                       context, UpdateUserScreen.routeName);
@@ -342,8 +361,10 @@ class CustomListTile extends StatelessWidget {
     required this.text,
     required this.function,
   });
+
   final String imagePath, text;
   final Function function;
+
   @override
   Widget build(BuildContext context) {
     return ListTile(

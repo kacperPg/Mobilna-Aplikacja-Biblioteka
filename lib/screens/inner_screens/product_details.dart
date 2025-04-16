@@ -2,6 +2,7 @@ import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 import 'package:prosta_aplikcja/providers/cart_provider.dart';
 import 'package:prosta_aplikcja/providers/products_provider.dart';
+import 'package:prosta_aplikcja/services/my_app_methods.dart';
 import 'package:prosta_aplikcja/widgets/products/heart_btn_witdget.dart';
 import 'package:prosta_aplikcja/widgets/subtitles_text.dart';
 import 'package:prosta_aplikcja/widgets/titles_text.dart';
@@ -90,16 +91,26 @@ class _ProductDetailsState extends State<ProductDetails> {
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(30))),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         if (cartProvider.isProdinCart(
                                             productId:
                                                 getCurrProduct.productId)) {
                                           return;
                                         }
-                                        cartProvider.addProductToCart(
-                                            productId:
-                                                getCurrProduct.productId);
-                                      },
+                                        try {
+                                          await cartProvider.addToCartFirebase(
+                                              productId: getCurrProduct.productId,
+                                              qty: 1,
+                                              context: context);
+                                        } catch (e) {
+                                          await MyAppMethods
+                                              .showErrorOrWarningDialog(
+                                            context: context,
+                                            subtitle: e.toString(),
+                                            fct: () {},
+                                          );
+                                        }
+                                        },
                                       icon: Icon(cartProvider.isProdinCart(
                                               productId:
                                                   getCurrProduct.productId)

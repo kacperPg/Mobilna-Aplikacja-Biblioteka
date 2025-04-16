@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
@@ -54,49 +55,72 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loginFct() async {
-    if (_formkey.currentState != null) {
-      final isValid = _formkey.currentState!.validate();
-      FocusScope.of(context).unfocus();
+if (_formkey.currentState != null) {
+    final isValid = _formkey.currentState!.validate();
+    FocusScope.of(context).unfocus();
 
-      FocusScope.of(context).unfocus();
-      if (isValid) {
-        try {
-          setState(() {
-            _isLoading = true;
-          });
+    if (isValid) {
+      try {
+        setState(() {
+          _isLoading = true;
+        });
 
-          await auth.signInWithEmailAndPassword(
-            email: _emailController.text.trim(),
-            password: _passwordController.text.trim(),
-          );
-          Fluttertoast.showToast(
-            msg: "Zalogowany",
-            textColor: Colors.white,
-          );
-          if (!mounted) return;
-          Navigator.pushReplacementNamed(context, RootScreen.routeName);
-        } on FirebaseException catch (error) {
-          await MyAppMethods.showErrorOrWarningDialog(
-            context: context,
-            subtitle: "Error nie udało ci się zalogować!",
-            fct: () {},
-          );
-        } catch (error) {
-          await MyAppMethods.showErrorOrWarningDialog(
-            context: context,
-            subtitle: "Error w aplikacji",
-            fct: () {},
-          );
-        } finally {
-          setState(() {
-            _isLoading = false;
-          });
+        UserCredential userCredential = await auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        final uid = userCredential.user!.uid;
+
+        // Pobierz dane użytkownika z Firestore
+        final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+        if (!userDoc.exists) {
+          throw FirebaseException(plugin: 'cloud_firestore', message: 'Brak danych użytkownika.');
         }
+
+        final userData = userDoc.data()!;
+        final userStatus = userData['userStatus'];
+
+        if (userStatus != 'Aktywny') {
+          await auth.signOut();
+          await MyAppMethods.showErrorOrWarningDialog(
+            context: context,
+            subtitle: "Twoje konto nie jest aktywne.",
+            fct: () {},
+          );
+          return;
+        }
+
+        Fluttertoast.showToast(
+          msg: "Zalogowany",
+          textColor: Colors.white,
+        );
+
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, RootScreen.routeName);
+      } on FirebaseException catch (error) {
+        await MyAppMethods.showErrorOrWarningDialog(
+          context: context,
+          subtitle: "Błąd logowania: Spróbuj ponownie",
+          fct: () {},
+        );
+      } catch (error) {
+        await MyAppMethods.showErrorOrWarningDialog(
+          context: context,
+          subtitle: "Wystąpił nieoczekiwany błąd",
+          fct: () {},
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
-    } else {
-      print("Wystąpił błąd!");
     }
+  } else {
+    print("Wystąpił błąd!");
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -235,15 +259,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: kBottomNavigationBarHeight + 10,
                         child: Row(
                           children: [
-                            const Expanded(
-                              flex: 2,
-                              child: SizedBox(
-                                height: kBottomNavigationBarHeight,
-                                child: FittedBox(
-                                  child: GoogleButton(),
-                                ),
-                              ),
-                            ),
+                            // const Expanded(
+                            //   flex: 2,
+                            //   child: SizedBox(
+                            //     height: kBottomNavigationBarHeight,
+                            //     child: FittedBox(
+                            //       child: GoogleButton(),
+                            //     ),
+                            //   ),
+                            // ),
                             const SizedBox(
                               width: 8,
                             ),

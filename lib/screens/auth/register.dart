@@ -115,6 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           'userEmail': _emailController.text.toLowerCase(),
           'createdAt': Timestamp.now(),
           'userRole': "Standard",
+          'userStatus': "Aktywny",
           'userWish': [],
           'userBooked': [],
           'yearOfBirth': _yearOfBirthController.text,

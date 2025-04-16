@@ -60,13 +60,21 @@ class BookedWidget extends StatelessWidget {
                             Column(
                               children: [
                                 IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      cartProvider.removeCartItemFromFirestore(
+                                        cartId: cartModel.cartId,
+                                        productId: getCurrProduct.productId,
+                                        qty: cartModel.quantity,
+                                      );
+                                    },
                                     icon: const Icon(
                                       Icons.delete,
                                       color: Colors.red,
                                     )),
                                 IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+
+                                    },
                                     icon: const Icon(
                                       IconlyLight.heart,
                                       color: Colors.red,

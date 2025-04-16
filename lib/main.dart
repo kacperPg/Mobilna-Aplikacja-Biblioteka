@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:prosta_aplikcja/consts/theme_data.dart';
+import 'package:prosta_aplikcja/providers/booked_provider.dart';
 import 'package:prosta_aplikcja/providers/cart_provider.dart';
 import 'package:prosta_aplikcja/providers/products_provider.dart';
 import 'package:prosta_aplikcja/providers/theme_provider.dart';
@@ -12,11 +13,15 @@ import 'package:prosta_aplikcja/screens/admin/bookedAdmin/booked_screen.dart';
 import 'package:prosta_aplikcja/screens/admin/dashborad_screen.dart';
 import 'package:prosta_aplikcja/screens/admin/edit_upload_product_form.dart';
 import 'package:prosta_aplikcja/screens/admin/seach_screen_admin.dart';
+import 'package:prosta_aplikcja/screens/admin/userAdmin/edit_users_screen.dart';
+import 'package:prosta_aplikcja/screens/admin/userAdmin/user_detail_screen.dart';
+import 'package:prosta_aplikcja/screens/admin/userAdmin/user_list_screen.dart';
 import 'package:prosta_aplikcja/screens/auth/login.dart';
 import 'package:prosta_aplikcja/screens/auth/register.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/category_screen.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/product_details.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/update_profile.dart';
+import 'package:prosta_aplikcja/screens/inner_screens/userOrders/orders_screen.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/viewed_recently.dart';
 import 'package:prosta_aplikcja/screens/inner_screens/wishlist_screen.dart';
 import 'package:prosta_aplikcja/screens/profile_screen.dart';
@@ -77,6 +82,9 @@ class MyApp extends StatelessWidget {
               ChangeNotifierProvider(create: (_) {
                 return UserProvider();
               }),
+              ChangeNotifierProvider(create: (_) {
+                return BookedProvider();
+              }),
             ],
             child: Consumer<ThemeProvider>(
                 builder: (context, themeProvider, child) {
@@ -109,6 +117,9 @@ class MyApp extends StatelessWidget {
                   EditOrUploadProductScreen.routeName: (context) =>
                       const EditOrUploadProductScreen(),
                   ProfileScreen.routeName: (context) => const ProfileScreen(),
+                  OrdersScreenFree.routeName: (context) => const OrdersScreenFree(),
+                  UserListScreen.routeName: (context) => UserListScreen(),
+                  UserDetailScreen.routeName: (context) => UserDetailScreen(),
                 },
               );
             }),

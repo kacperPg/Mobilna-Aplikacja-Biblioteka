@@ -5,11 +5,11 @@ import 'package:prosta_aplikcja/widgets/titles_text.dart';
 import 'package:provider/provider.dart';
 
 class BookedBottomCheckout extends StatelessWidget {
-  const BookedBottomCheckout({super.key});
+  const BookedBottomCheckout({super.key, required this.function});
+  final Function function;
 
   @override
   Widget build(BuildContext context) {
-     final productsProvider = Provider.of<ProductsProvider>(context);
     final cartProvider = Provider.of<CartProvider>(context);
     return Container(
       decoration: BoxDecoration(
@@ -36,7 +36,9 @@ class BookedBottomCheckout extends StatelessWidget {
               ),
               const Spacer(),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  await function();
+                },
                 child: const Text("Zarezerwuj"),
               ),
             ],

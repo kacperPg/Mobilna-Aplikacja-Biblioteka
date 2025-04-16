@@ -1,27 +1,31 @@
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:prosta_aplikcja/root_screen.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:prosta_aplikcja/models/user_model.dart';
+import 'package:prosta_aplikcja/screens/admin/userAdmin/user_list_screen.dart';
+import 'package:prosta_aplikcja/widgets/auth/image_picker_widget.dart';
+import 'package:prosta_aplikcja/widgets/titles_text.dart';
 import 'package:provider/provider.dart';
 import 'package:prosta_aplikcja/providers/user_provider.dart';
-import 'package:prosta_aplikcja/widgets/auth/image_picker_widget.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:prosta_aplikcja/widgets/titles_text.dart';
 
-class UpdateUserScreen extends StatefulWidget {
-  static const routeName = "/UpdateUserScreen";
-  const UpdateUserScreen({super.key});
+class EditUserProfileScreen extends StatefulWidget {
+  static const routeName = '/editUsers';
+  final UserModel user;
+
+  const EditUserProfileScreen({Key? key, required this.user}) : super(key: key);
 
   @override
-  State<UpdateUserScreen> createState() => _UpdateUserScreenState();
+  _EditUserProfileScreenState createState() => _EditUserProfileScreenState();
 }
 
-class _UpdateUserScreenState extends State<UpdateUserScreen> {
+class _EditUserProfileScreenState extends State<EditUserProfileScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _birthYearController = TextEditingController();
   final TextEditingController _userEmail = TextEditingController();
   final TextEditingController _studentId = TextEditingController();
+    final TextEditingController _userStatus = TextEditingController();
   XFile? _pickedImage;
   bool _isLoading = false;
   final auth = FirebaseAuth.instance;
@@ -29,22 +33,28 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
   @override
   void initState() {
     super.initState();
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.getUserModel;
+    if (widget.user != null) {
+      _nameController.text = widget.user.userName;
+      _userEmail.text = widget.user.userEmail;
+      _studentId.text = widget.user.albumNumber!;
+      _birthYearController.text = widget.user.birthYear!;
+        _userStatus.text = widget.user.userStatus;
+    }
+  }
 
-    if (user != null) {
-      _nameController.text = user.userName;
-      _nameController.text = user.userName;
-      _userEmail.text = user.userEmail;
-      _studentId.text = user.albumNumber!;
-      _birthYearController.text = user.birthYear.toString();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.user != null) {
+      _nameController.text = widget.user.userName;
+      _userEmail.text = widget.user.userEmail;
+      _studentId.text = widget.user.albumNumber!;
+      _birthYearController.text = widget.user.birthYear.toString();
     }
   }
 
   Future<void> _updateUser() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = auth.currentUser;
-    if (user == null) return;
 
     setState(() {
       _isLoading = true;
@@ -55,20 +65,23 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
       final ref = FirebaseStorage.instance
           .ref()
           .child("usersImages")
-          .child("${user.uid}.jpg");
+          .child("${widget.user.userId}.jpg");
       await ref.putFile(File(_pickedImage!.path));
       userImageUrl = await ref.getDownloadURL();
     }
 
-    await userProvider.updateUser(
+    await userProvider.updateProvidedUser(
         userName: _nameController.text,
         userImage: userImageUrl,
-        birthYear: _birthYearController.text);
+                userStatus:_userStatus.text ,
+        birthYear: _birthYearController.text,
+    user: widget.user);
 
     setState(() {
       _isLoading = false;
     });
-        Navigator.pushReplacementNamed(context, RootScreen.routeName);
+
+    Navigator.pushNamed(context, UserListScreen.routeName);
   }
 
   Future<void> _pickImage() async {
@@ -84,10 +97,9 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    final user = userProvider.getUserModel;
     Size size = MediaQuery.of(context).size;
-    if (user == null) {
+
+    if (widget.user == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -169,13 +181,27 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
                     });
                   }
                 },
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Proszę podać rok urodzenia';
-                  }
-                  return null;
-                },
               ),
+              const SizedBox(height: 16),
+             DropdownButtonFormField<String>(
+              value: _userStatus.text,
+              decoration: const InputDecoration(labelText: 'Status'),
+              items: const [
+                DropdownMenuItem(
+                  value: "Aktywny",
+                  child: Text("Aktywny"),
+                ),
+                DropdownMenuItem(
+                  value: "NieAktywny",
+                  child: Text("NieAktywny"),
+                ),
+              ],
+              onChanged: (String? newValue) {
+                setState(() {
+                  _userStatus.text = newValue!;
+                });
+              },
+            ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _updateUser,

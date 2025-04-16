@@ -89,9 +89,9 @@ class _ProductWidgetState extends State<ProductWidget> {
                                           return;
                                         }
                                         try {
-                                          cartProvider.addProductToCart(
+                                          cartProvider.addToCartFirebase(
                                               productId:
-                                                  getCurrProduct.productId);
+                                                  getCurrProduct.productId, qty: 1, context: context);
                                         } catch (e) {
                                           await MyAppMethods
                                               .showErrorOrWarningDialog(
@@ -105,9 +105,9 @@ class _ProductWidgetState extends State<ProductWidget> {
                                                 getCurrProduct.productId)) {
                                           return;
                                         }
-                                        cartProvider.addProductToCart(
+                                        cartProvider.addToCartFirebase(
                                             productId:
-                                                getCurrProduct.productId);
+                                            getCurrProduct.productId, qty: 1, context: context);
                                       },
                                       splashColor: Colors.red,
                                       child: Padding(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prosta_aplikcja/screens/admin/bookedAdmin/booked_screen.dart';
 import 'package:prosta_aplikcja/screens/admin/edit_upload_product_form.dart';
 import 'package:prosta_aplikcja/screens/admin/seach_screen_admin.dart';
+import 'package:prosta_aplikcja/screens/admin/userAdmin/user_list_screen.dart';
 import 'package:prosta_aplikcja/services/assets_manager.dart';
 
 class DashboardButtonsModel {
@@ -36,7 +37,7 @@ class DashboardButtonsModel {
           },
         ),
         DashboardButtonsModel(
-          text: "Zobacz Wypożyczenia",
+          text: "Zarządzaj Wypożyczeniami",
           imagePath: AssetsManager.bookedSvg,
           onPressed: () {
             Navigator.pushNamed(
@@ -46,9 +47,14 @@ class DashboardButtonsModel {
           },
         ),
         DashboardButtonsModel(
-          text: "Zobacz Użytkowników",
+          text: "Zarządzaj Użytkownikami",
           imagePath: AssetsManager.userIcon,
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              UserListScreen.routeName,
+            );
+          },
         ),
       ];
 }

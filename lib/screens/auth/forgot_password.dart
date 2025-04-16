@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:prosta_aplikcja/widgets/subtitles_text.dart';
@@ -32,11 +33,49 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  Future<void> _forgetPassFCT() async {
-    final isValid = _formKey.currentState!.validate();
-    FocusScope.of(context).unfocus();
-    if (isValid) {}
+Future<void> _forgetPassFCT() async {
+  final isValid = _formKey.currentState!.validate();
+  FocusScope.of(context).unfocus();
+  if (isValid) {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: _emailController.text.trim(),
+      );
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("E-mail wysłany!"),
+          content: const Text(
+              "Link do resetowania hasła został wysłany na Twój e-mail."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Błąd"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    }
   }
+}
 
   @override
   Widget build(BuildContext context) {

@@ -4,28 +4,29 @@ import 'package:prosta_aplikcja/models/product_model.dart';
 import 'package:uuid/uuid.dart';
 
 class ProductsProvider with ChangeNotifier {
-   List<ProductModel> _products = [];
+   List<ProductModel> products = [];
  
  List<ProductModel> get getProducts {
    fetchProducts();
-    return _products;
+    return products;
   }
 
  List<ProductModel> get getProductsFromDB {
      fetchProducts();
-    return _products;
+    return products;
   }
 
   ProductModel? findByProdId(String productId) {
-    if (_products.where((element) => element.productId == productId).isEmpty) {
+    fetchProductsStream();
+    if (products.where((element) => element.productId == productId).isEmpty) {
       return null;
     }
-    return _products.firstWhere((element) => element.productId == productId);
+    return products.firstWhere((element) => element.productId == productId);
   }
 
   List<ProductModel> findByCategory({required String categoryName}) {
     fetchProductsStream();
-    List<ProductModel> ctgList = _products
+    List<ProductModel> ctgList = products
         .where((element) => element.productCategory
             .toLowerCase()
             .contains(categoryName.toLowerCase()))
@@ -50,13 +51,13 @@ class ProductsProvider with ChangeNotifier {
   Future<List<ProductModel>> fetchProducts() async {
     try {
       await productDB.get().then((productsSnapshot) {
-        _products.clear();
+        products.clear();
         for (var element in productsSnapshot.docs) {
-          _products.insert(0, ProductModel.fromFirestore(element));
+          products.insert(0, ProductModel.fromFirestore(element));
         }
       });
       notifyListeners();
-      return _products;
+      return products;
     } catch (error) {
       rethrow;
     }
@@ -65,89 +66,14 @@ class ProductsProvider with ChangeNotifier {
   Stream<List<ProductModel>> fetchProductsStream() {
     try {
       return productDB.snapshots().map((snapshot) {
-       _products = [];
+       products = [];
         for (var element in snapshot.docs) {
-          _products.add( ProductModel.fromFirestore(element));
+          products.add( ProductModel.fromFirestore(element));
         }
-        return _products;
+        return products;
       });
     } catch (e) {
       rethrow;
     }
   }
-
-  List<ProductModel> products = [
-    ProductModel(
-      productId: const Uuid().v4(),
-      productTitle: "Podstawy algorytmów",
-      productAutor: "Donald Knuth",
-      productCategory: "Informatyka",
-      productDescription: "Podstawowa książka na temat algorytmów.",
-      productImage: "https://www.flutterengineering.io/bookcover_isbn.png",
-      productQuantity: "5",
-    ),
-    ProductModel(
-      productId: const Uuid().v4(),
-      productTitle: "Zarys chemii organicznej",
-      productAutor: "John Smith",
-      productCategory: "Chemia",
-      productDescription: "Kompletny przewodnik po chemii organicznej.",
-      productImage: "https://www.flutterengineering.io/bookcover_isbn.png",
-      productQuantity: "10",
-    ),
-    ProductModel(
-      productId: const Uuid().v4(),
-      productTitle: "Historia starożytnego Rzymu",
-      productAutor: "Jane Doe",
-      productCategory: "Historia",
-      productDescription: "Dogłębne badania nad starożytnym Rzymem.",
-      productImage: "https://www.flutterengineering.io/bookcover_isbn.png",
-      productQuantity: "8",
-    ),
-    ProductModel(
-      productId: const Uuid().v4(),
-      productTitle: "Teorie ekonomiczne XXI wieku",
-      productAutor: "Adam Smith",
-      productCategory: "Ekonomia",
-      productDescription: "Analiza współczesnych teorii ekonomicznych.",
-      productImage: "https://www.flutterengineering.io/bookcover_isbn.png",
-      productQuantity: "12",
-    ),
-    ProductModel(
-      productId: const Uuid().v4(),
-      productTitle: "Nowoczesne inżynieria lądowa",
-      productAutor: "Robert Lang",
-      productCategory: "Inżynieria",
-      productDescription: "Przegląd współczesnych technologii budowlanych.",
-      productImage: "https://www.flutterengineering.io/bookcover_isbn.png",
-      productQuantity: "7",
-    ),
-    ProductModel(
-      productId: const Uuid().v4(),
-      productTitle: "Koncepcje psychologiczne",
-      productAutor: "Sigmund Freud",
-      productCategory: "Psychologia",
-      productDescription: "Omówienie kluczowych teorii psychologicznych.",
-      productImage: "https://www.flutterengineering.io/bookcover_isbn.png",
-      productQuantity: "9",
-    ),
-    ProductModel(
-      productId: const Uuid().v4(),
-      productTitle: "Klasyczne powieści grozy",
-      productAutor: "Edgar Allan Poe",
-      productCategory: "Horror",
-      productDescription: "Zbiór przerażających historii grozy.",
-      productImage: "https://www.flutterengineering.io/bookcover_isbn.png",
-      productQuantity: "15",
-    ),
-    ProductModel(
-      productId: const Uuid().v4(),
-      productTitle: "Podróż do gwiazd",
-      productAutor: "Isaac Asimov",
-      productCategory: "Science fiction",
-      productDescription: "Eksploracja kosmosu w formie science fiction.",
-      productImage: "https://www.flutterengineering.io/bookcover_isbn.png",
-      productQuantity: "4",
-    ),
-  ];
 }
